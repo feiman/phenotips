@@ -2,6 +2,7 @@ org.phenotips.studies.family.script.FamilyScriptService
 org.phenotips.studies.family.script.PedigreeScriptService
 org.phenotips.studies.family.internal.PedigreeProcessorImpl
 org.phenotips.studies.family.listener.PermissionsChangeListener
+org.phenotips.studies.family.internal.FamilyEntityManager
 org.phenotips.studies.family.internal.PhenotipsFamilyRepository
 org.phenotips.studies.family.internal.PhenotipsFamilyPermissions
 org.phenotips.studies.family.internal.PhenotipsFamilyTools
