@@ -44,27 +44,28 @@ public interface SecureContextFactory
      * @throws WebApplicationException if the patient could not be found, or the current user does not have high enough
      *             access level
      */
-    PatientAccessContext getContext(String patientId, String minimumAccessLevel) throws WebApplicationException;
+    PatientAccessContext getContext(String patientId, String entityType, String minimumAccessLevel)
+        throws WebApplicationException;
 
     /**
      * Provides the patient, current user, and access context, for a read operation, making sure that the current user
      * has view access on the patient record.
      *
-     * @param patientId by which a patient is to be found
+     * @param entityId by which a patient is to be found
      * @return context containing a {@link org.phenotips.data.Patient} instance and the current user
      * @throws WebApplicationException if the patient could not be found, or the current user does not have high enough
      *             access level
      */
-    PatientAccessContext getReadContext(String patientId) throws WebApplicationException;
+    PatientAccessContext getReadContext(String entityId, String entityType) throws WebApplicationException;
 
     /**
      * Provides the patient, current user, and access context, for a read operation, making sure that the current user
      * has manage access on the patient record.
      *
-     * @param patientId by which a patient is to be found
+     * @param entityId by which a patient is to be found
      * @return context containing a {@link org.phenotips.data.Patient} instance and the current user
      * @throws WebApplicationException if the patient could not be found, or the current user does not have high enough
      *             access level
      */
-    PatientAccessContext getWriteContext(String patientId) throws WebApplicationException;
+    PatientAccessContext getWriteContext(String entityId, String entityType) throws WebApplicationException;
 }

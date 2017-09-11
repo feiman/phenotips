@@ -17,11 +17,11 @@
  */
 package org.phenotips.data.permissions.rest.internal.utils;
 
-import org.phenotips.data.Patient;
-import org.phenotips.data.PatientRepository;
+import org.phenotips.data.Patient;import org.phenotips.data.PrimaryEntityManager<PrimaryEntity>;
 import org.phenotips.data.permissions.AccessLevel;
 import org.phenotips.data.permissions.PatientAccess;
-import org.phenotips.data.permissions.PermissionsManager;
+import org.phenotips.data.permissions.PermissionsManager;import org.phenotips.e
+import org.phenotips.entities.PrimaryEntity;import org.phenotips.entities.PrimaryEntityManager;ntities.PrimaryEntity;
 
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.users.User;
@@ -45,7 +45,7 @@ public class PatientAccessContext
 {
     private Logger logger = LoggerFactory.getLogger(PatientAccessContext.class);
 
-    private Patient patient;
+    private PrimaryEntity entity;
 
     private User currentUser;
 
@@ -67,18 +67,19 @@ public class PatientAccessContext
      * @param userOrGroupResolver document reference resolver that can resolve an identifier to either a user or a group
      * @throws WebApplicationException if the patient could not be found, or the current user has insufficient rights
      */
-    public PatientAccessContext(String patientId, AccessLevel minimumAccessLevel, PatientRepository repository,
+    public PatientAccessContext(String patientId, AccessLevel minimumAccessLevel,
+        PrimaryEntityManager<?> repository,
         UserManager users, PermissionsManager manager, DocumentReferenceResolver<String> userOrGroupResolver)
         throws WebApplicationException
     {
         this.manager = manager;
-        this.patient = repository.get(patientId);
-        if (this.patient == null) {
+        this.entity = repository.get(patientId);
+        if (this.entity == null) {
             this.logger.debug("No such patient record: [{}]", patientId);
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
         this.userOrGroupResolver = userOrGroupResolver;
-        this.patientAccess = this.manager.getPatientAccess(this.patient);
+        this.patientAccess = this.manager.getPatientAccess(this.entity);
         this.initializeUser(minimumAccessLevel, users, this.logger);
     }
 
@@ -89,7 +90,7 @@ public class PatientAccessContext
             throw new WebApplicationException(Response.Status.UNAUTHORIZED);
         } else if (!this.patientAccess.hasAccessLevel(this.currentUser.getProfileDocument(), minimumAccessLevel)) {
             logger.debug("{} access denied to user [{}] on patient record [{}]",
-                minimumAccessLevel.getName(), this.currentUser, this.patient.getId());
+                minimumAccessLevel.getName(), this.currentUser, this.entity.getId());
             throw new WebApplicationException(Response.Status.FORBIDDEN);
         }
     }
@@ -101,7 +102,7 @@ public class PatientAccessContext
      */
     public Patient getPatient()
     {
-        return this.patient;
+        return this.entity;
     }
 
     /**

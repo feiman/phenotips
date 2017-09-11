@@ -40,7 +40,7 @@ import javax.ws.rs.core.Response;
  * @version $Id$
  * @since 1.3M2
  */
-@Path("/patients/{patient-id}/permissions")
+@Path("/{entity-type}/{patient-id}/permissions")
 @Relation("https://phenotips.org/rel/permissions")
 @ParentResource(PatientResource.class)
 public interface PermissionsResource
@@ -55,7 +55,8 @@ public interface PermissionsResource
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @RequiredAccess("view")
-    PermissionsRepresentation getPermissions(@PathParam("patient-id") String patientId);
+    PermissionsRepresentation getPermissions(@PathParam("patient-id") String patientId,
+        @PathParam("entity-type") String entityType);
 
     /**
      * Overwrites all permissions: owner, collaborators, visibility. All elements must be present in the input JSON. If

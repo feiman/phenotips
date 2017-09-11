@@ -17,13 +17,15 @@
  */
 package org.phenotips.data.permissions.rest.internal.utils;
 
-import org.phenotips.data.PatientRepository;
 import org.phenotips.data.permissions.AccessLevel;
 import org.phenotips.data.permissions.PermissionsManager;
+import org.phenotips.entities.PrimaryEntityManager;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.users.UserManager;
+
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -42,7 +44,7 @@ import javax.ws.rs.WebApplicationException;
 public class DefaultSecureContextFactory implements SecureContextFactory
 {
     @Inject
-    private PatientRepository repository;
+    private Map<String, PrimaryEntityManager<?>> repositories;
 
     @Inject
     private UserManager users;
@@ -56,22 +58,24 @@ public class DefaultSecureContextFactory implements SecureContextFactory
     private DocumentReferenceResolver<String> userOrGroupResolver;
 
     @Override
-    public PatientAccessContext getContext(String patientId, String minimumAccessLevel) throws WebApplicationException
+    public PatientAccessContext getContext(String patientId, String entityType, String minimumAccessLevel)
+        throws WebApplicationException
     {
         AccessLevel level = this.permissionsManager.resolveAccessLevel(minimumAccessLevel);
-        return new PatientAccessContext(patientId, level, this.repository, this.users, this.permissionsManager,
+        return new PatientAccessContext(patientId, level, this.repositories.get(entityType), this.users,
+            this.permissionsManager,
             this.userOrGroupResolver);
     }
 
     @Override
-    public PatientAccessContext getReadContext(String patientId) throws WebApplicationException
+    public PatientAccessContext getReadContext(String entityId, String entityType) throws WebApplicationException
     {
-        return getContext(patientId, "view");
+        return getContext(entityId, entityType, "view");
     }
 
     @Override
-    public PatientAccessContext getWriteContext(String patientId) throws WebApplicationException
+    public PatientAccessContext getWriteContext(String entityId, String entityType) throws WebApplicationException
     {
-        return getContext(patientId, "manage");
+        return getContext(entityId, entityType, "manage");
     }
 }

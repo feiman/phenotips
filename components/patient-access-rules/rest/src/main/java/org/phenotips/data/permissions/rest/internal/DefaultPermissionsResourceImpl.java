@@ -81,11 +81,11 @@ public class DefaultPermissionsResourceImpl extends XWikiResource implements Per
     private CollaboratorsResource collaboratorsResource;
 
     @Override
-    public PermissionsRepresentation getPermissions(String patientId)
+    public PermissionsRepresentation getPermissions(String entityId, String entityType)
     {
-        this.logger.debug("Retrieving patient record [{}] via REST", patientId);
+        this.logger.debug("Retrieving patient record [{}] via REST", entityId);
         // besides getting the patient, checks that the user has view access
-        PatientAccessContext patientAccessContext = this.secureContextFactory.getReadContext(patientId);
+        PatientAccessContext patientAccessContext = this.secureContextFactory.getReadContext(entityId, entityType);
 
         PermissionsRepresentation result = new PermissionsRepresentation();
         OwnerRepresentation owner = this.factory.createOwnerRepresentation(patientAccessContext.getPatient());
