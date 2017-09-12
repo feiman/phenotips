@@ -275,7 +275,8 @@ public abstract class AbstractPrimaryEntityManager<E extends PrimaryEntity> impl
      *
      * @return a short string
      */
-    protected String getIdPrefix()
+    @Override
+    public String getIdPrefix()
     {
         String name = getEntityXClassReference().getName();
         name = StringUtils.removeEnd(name, "Class");
