@@ -868,42 +868,15 @@ define([
         },
 
         _buildNewCancerElement: function(cancerId, cancerName, dataName, optionsParam) {
+            var toStoredLateralityMap = {"Bilateral" : "bi", "Unilateral" : "u", "Right" : "r", "Left" : "l"};
+            var toDisplayedLateralityMap = {"bi" : "Bilateral", "u" : "Unilateral", "r" : "Right", "l" : "Left"};
+
             var toStoredLateralityFx = function(value) {
-                switch(value) {
-                    case "Bilateral":
-                        return "bi";
-                        break;
-                    case "Unilateral":
-                        return "u";
-                        break;
-                    case "Right":
-                        return "r";
-                        break;
-                    case "Left":
-                        return "l";
-                        break;
-                    default:
-                        return "";
-                }
+                return toStoredLateralityMap[value] || "";
             };
 
             var toDisplayedLateralityFx = function(value) {
-                switch(value) {
-                    case "bi":
-                        return "Bilateral";
-                        break;
-                    case "u":
-                        return "Unilateral";
-                        break;
-                    case "r":
-                        return "Right";
-                        break;
-                    case "l":
-                        return "Left";
-                        break;
-                    default:
-                        return "Unknown";
-                }
+                return toDisplayedLateralityMap[value] || "Unknown";
             };
 
             var toStoredTypeFx = function(value) {
@@ -1277,7 +1250,7 @@ define([
             },
             'cancerlist': function (container, value) {
                 var cancerLegend = editor.getCancerLegend();
-                if (Object.getOwnPropertyNames(value).length === 0) {
+                if (typeof value === 'object' && Object.getOwnPropertyNames(value).length === 0) {
                     container.select('table.cancers-summary-group').each(function(qualifiers) {
                         var cancerWidget = qualifiers._widget;
                         var cancerID = cancerWidget.getID();

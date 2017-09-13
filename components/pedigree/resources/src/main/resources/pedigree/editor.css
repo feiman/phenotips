@@ -1176,6 +1176,9 @@ table.summary-group div.summary-item {
   margin: 0 0 0 2em;
   position: relative;
 }
+table.summary-group div.summary-item.blurred {
+  cursor: pointer;
+}
 div.summary-item div.clearfloats {
   margin: 0;
 }

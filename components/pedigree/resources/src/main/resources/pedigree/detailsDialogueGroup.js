@@ -19,6 +19,7 @@ define([
             var groupOptions = options || {};
             this._allowMultiDialogues = groupOptions.allowMultiDialogues || false;
             this._disableTermDelete = groupOptions.disableTermDelete || false;
+            this._doneTypingInterval = groupOptions.doneTypingInterval || 500;
 
             this._dialogueOptions = [];
 
@@ -271,22 +272,20 @@ define([
         _buildEmptyContainer: function() {
             this._qualifiersContainer = new Element('table', {'class' : 'summary-group ' + this._dataName + "-summary-group"});
             this._qualifiersContainer.name = this._dataName;
-            this._qualifiersContainer.innerHTML =
-                  '<tbody>' +
-                      '<tr class="term-holder">' +
-                          '<td>' +
-                              '<span class="term-data"></span>' +
-                              '<span class="delete-button-holder"></span>' +
-                          '</td>' +
-                      '</tr>' +
-                      '<tr>' +
-                          '<td class="dialogue-holder"></td>' +
-                      '</tr>' +
-                      '<tr>' +
-                          '<td class="add-button-holder"></td>' +
-                      '</tr>' +
-                  '</tbody>';
-            this._dialogueHolder = this._qualifiersContainer.down('td.dialogue-holder');
+
+            this._dialogueHolder = new Element('td', {'class' : 'dialogue-holder'});
+
+            var tbody = new Element('tbody')
+              .insert(new Element('tr', {'class' : 'term-holder'})
+                .insert(new Element('td')
+                  .insert(new Element('span', {'class' : 'term-data'}))
+                  .insert(new Element('span', {'class' : 'delete-button-holder'}))))
+              .insert(new Element('tr')
+                .insert(this._dialogueHolder))
+              .insert(new Element('tr')
+                .insert(new Element('td', {'class' : 'add-button-holder'})));
+
+            this._qualifiersContainer.insert(tbody);
             this._dialogueHolder.hide();
         },
 
@@ -469,9 +468,9 @@ define([
                         _this._focus(_this._crtFocus);
                     }
                 } else {
-                    if (_this._crtFocus && (!event.target.hasClassName('term-status')
-                        || _this._dialogueHolder.up('table') !== clickedDialogueHolder.up('table'))) {
-
+                    if (_this._crtFocus && ('term-status' === !event.target.className || (!clickedDialogueHolder
+                        || _this._dialogueHolder.up('table') !== clickedDialogueHolder.up('table')))) {
+                        // Blur anything in focus.
                         _this._blur(_this._crtFocus);
                         _this._crtFocus = null;
                     }
@@ -519,10 +518,9 @@ define([
         _attachKeyUpObserver: function() {
             var _this = this;
             var typingTimer;
-            var doneTypingInterval = 500;
             this._dialogueHolder.observe('keyup', function(event) {
                 clearTimeout(typingTimer);
-                typingTimer = setTimeout(doneTyping.bind(_this, event), doneTypingInterval);
+                typingTimer = setTimeout(doneTyping.bind(_this, event), _this._doneTypingInterval);
             });
 
             this._dialogueHolder.observe('keydown', function() {
