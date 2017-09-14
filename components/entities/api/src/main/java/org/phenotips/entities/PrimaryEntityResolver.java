@@ -19,9 +19,6 @@ package org.phenotips.entities;
 
 import org.xwiki.component.annotation.Role;
 
-import java.util.Collection;
-
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -62,12 +59,4 @@ public interface PrimaryEntityResolver
      * @return true iff a {@link PrimaryEntityManager} exists for the provided {@code entityType}
      */
     boolean hasEntityManager(@Nullable String entityType);
-
-    /**
-     * Retrieves all available {@link PrimaryEntityManager} objects.
-     *
-     * @return the collection of all available {@link PrimaryEntityManager} objects
-     */
-    @Nonnull
-    Collection<PrimaryEntityManager> getEntityManagers();
 }

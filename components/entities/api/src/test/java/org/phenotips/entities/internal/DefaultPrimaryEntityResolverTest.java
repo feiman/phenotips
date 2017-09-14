@@ -21,9 +21,9 @@ import org.phenotips.entities.PrimaryEntity;
 import org.phenotips.entities.PrimaryEntityManager;
 import org.phenotips.entities.PrimaryEntityResolver;
 
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
@@ -95,6 +95,34 @@ public class DefaultPrimaryEntityResolverTest
         this.mocker.registerComponent(PrimaryEntityManager.class, "Patient", this.patientResolver);
 
         this.component = this.mocker.getComponentUnderTest();
+    }
+
+    @Test(expected = InitializationException.class)
+    public void initializeThrowsExceptionIfSomePrimaryEntityManagerHasNullIdPrefix() throws Exception
+    {
+        when(this.familyResolver.getIdPrefix()).thenReturn(null);
+        ((Initializable) this.component).initialize();
+    }
+
+    @Test(expected = InitializationException.class)
+    public void initializeThrowsExceptionIfSomePrimaryEntityManagerHasEmptyIdPrefix() throws Exception
+    {
+        when(this.familyResolver.getIdPrefix()).thenReturn(StringUtils.EMPTY);
+        ((Initializable) this.component).initialize();
+    }
+
+    @Test(expected = InitializationException.class)
+    public void initializeThrowsExceptionIfSomePrimaryEntityManagerHasBlankIdPrefix() throws Exception
+    {
+        when(this.familyResolver.getIdPrefix()).thenReturn(StringUtils.SPACE);
+        ((Initializable) this.component).initialize();
+    }
+
+    @Test(expected = InitializationException.class)
+    public void initializeThrowsExceptionIfPrimaryEntityManagersHaveDuplicatePrefix() throws Exception
+    {
+        when(this.familyResolver.getIdPrefix()).thenReturn(PATIENT_ID_PREFIX);
+        ((Initializable) this.component).initialize();
     }
 
     @Test
@@ -218,14 +246,5 @@ public class DefaultPrimaryEntityResolverTest
     {
         Assert.assertTrue(this.component.hasEntityManager(FAMILY));
         Assert.assertTrue(this.component.hasEntityManager(PATIENT));
-    }
-
-    @Test
-    public void getEntityManagersReturnsAllRegisteredEntityManagers()
-    {
-        final Collection<PrimaryEntityManager> managers = this.component.getEntityManagers();
-        Assert.assertEquals(2, managers.size());
-        Assert.assertTrue(managers.contains(this.familyResolver));
-        Assert.assertTrue(managers.contains(this.patientResolver));
     }
 }

@@ -25,7 +25,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -52,13 +51,18 @@ public class DefaultPrimaryEntityResolver implements PrimaryEntityResolver, Init
     @Inject
     private Map<String, PrimaryEntityManager> repositories;
 
+    /** Currently available primary entity managers, mapped by their entity ID prefix. */
     private Map<String, PrimaryEntityManager> repositoriesByPrefix;
 
     @Override
     public void initialize() throws InitializationException
     {
-        this.repositoriesByPrefix = this.repositories.values().stream()
-            .collect(Collectors.toMap(PrimaryEntityManager::getIdPrefix, Function.identity()));
+        try {
+            this.repositoriesByPrefix = this.repositories.values().stream()
+                .collect(Collectors.toMap(this::getIdPrefix, Function.identity(), this::resolveCollisions));
+        } catch (final RuntimeException ex) {
+            throw new InitializationException(ex.getMessage());
+        }
     }
 
     @Nullable
@@ -93,10 +97,36 @@ public class DefaultPrimaryEntityResolver implements PrimaryEntityResolver, Init
         return StringUtils.isNotBlank(entityType) && this.repositories.containsKey(entityType);
     }
 
-    @Nonnull
-    @Override
-    public Collection<PrimaryEntityManager> getEntityManagers()
+    /**
+     * Tries to get the id prefix from the provided primary entity {@code manager}. Throws an exception if the prefix
+     * is blank.
+     *
+     * @param manager the {@link PrimaryEntityManager} from which the id prefix will be retrieved; must not be null
+     * @return the id prefix for the specified {@code manager}
+     */
+    private String getIdPrefix(@Nonnull final PrimaryEntityManager manager)
     {
-        return this.repositories.values();
+        final String prefix = manager.getIdPrefix();
+        if (StringUtils.isBlank(prefix)) {
+            throw new RuntimeException("No prefix specified for PrimaryEntityManager");
+        }
+        return prefix;
+    }
+
+    /**
+     * This method is called iff {@code manager1} and {@code manager2} have the same
+     * {@link PrimaryEntityManager#getIdPrefix()}. Throws an exception if called.
+     *
+     * @param manager1 {@link PrimaryEntityManager}
+     * @param manager2 {@link PrimaryEntityManager}
+     * @return nothing; always throws a {@link RuntimeException}
+     */
+    private PrimaryEntityManager resolveCollisions(
+        @Nonnull final PrimaryEntityManager manager1,
+        @Nonnull final PrimaryEntityManager manager2)
+    {
+        // If this is called, there are primary entity managers that have the same id prefix. Throw exception.
+        throw new RuntimeException("PrimaryEntityManager objects must not have the same ID prefix. "
+            + "Duplicate prefix detected: " + manager1.getIdPrefix());
     }
 }
