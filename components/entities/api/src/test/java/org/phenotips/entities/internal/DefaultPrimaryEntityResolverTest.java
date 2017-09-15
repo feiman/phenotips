@@ -52,7 +52,7 @@ public class DefaultPrimaryEntityResolverTest
 
     private static final String FAMILY_1_ID = "FAM001";
 
-    private static final String PATIENT_1_ID = "P001";
+    private static final String PATIENT_1_ID = "xwiki:data.P001";
 
     private static final String PATIENT_2_ID = "P002";
 

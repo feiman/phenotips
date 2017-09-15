@@ -74,7 +74,7 @@ public class DefaultPrimaryEntityResolver implements PrimaryEntityResolver, Init
             return null;
         }
         // Try to get the prefix; don't bother searching if it's blank.
-        final String prefix = entityId.replaceAll("^(\\D+)\\d+$", "$1");
+        final String prefix = entityId.replaceAll("^(\\D+\\.)?([A-Za-z]+)\\d+$", "$2");
         if (StringUtils.isBlank(prefix)) {
             return null;
         }
